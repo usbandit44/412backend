@@ -4,10 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const pool = new Pool({
-  user: "arvinedouard",
-  host: "127.0.0.1",
-  database: "arvinedouard",
-  port: 9999,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  port: parseInt(process.env.DB_PORT || "9999"),
 });
 
 export default pool;
