@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import pool from "./db";
+import * as crypto from "crypto";
+
 
 // Get all users
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
@@ -79,21 +81,23 @@ export const deleteUser = async (
 //Sign Up Function
 export const signUp = async (req: Request, res: Response): Promise<void> => {
   const { name, username, password, birthday, phoneNumber, address, type } = req.body;
+  // Generate a unique ID
+  const id = parseInt(crypto.randomBytes(4).toString("hex"), 16); // Converts random bytes to a unique numeric ID
   try {
     if (type === "buyer") {
       // Insert into Customer table
       const result = await pool.query(
-        `INSERT INTO Customer (c_name, c_username, c_password, c_birthday, c_number, c_address)
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING c_id`,
-        [name, username, password, birthday, phoneNumber, address]
+        `INSERT INTO Customer (c_id, c_name, c_username, c_password, c_birthday, c_number, c_address)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING c_id`,
+        [id, name, username, password, birthday, phoneNumber, address]
       );
       res.status(201).json({ id: result.rows[0].c_id });
     } else if (type === "seller") {
       // Insert into Seller table
       const result = await pool.query(
-        `INSERT INTO Seller (s_name, s_username, s_password, s_birthday, s_number, s_address)
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING s_id`,
-        [name, username, password, birthday, phoneNumber, address]
+        `INSERT INTO Seller (s_id, s_name, s_username, s_password, s_birthday, s_number, s_address)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING s_id`,
+        [id, name, username, password, birthday, phoneNumber, address]
       );
       res.status(201).json({ id: result.rows[0].s_id });
     } else {
