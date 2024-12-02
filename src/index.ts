@@ -8,6 +8,7 @@ import {
   updateUser,
   deleteUser,
   signUp,
+  signIn,
 } from "./queries";
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.post("/users", createUser);
 app.put("/users/:id", updateUser);
 app.delete("/users/:id", deleteUser);
 app.post("/signup", signUp);
+app.post("/signIn", signIn);
 
 // Start the server
 app.listen(port, () => {

@@ -19,6 +19,7 @@ app.get("/users/:id", queries_1.getUserById);
 app.post("/users", queries_1.createUser);
 app.put("/users/:id", queries_1.updateUser);
 app.delete("/users/:id", queries_1.deleteUser);
+app.post("/signup", queries_1.signUp);
 // Start the server
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);

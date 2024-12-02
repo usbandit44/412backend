@@ -108,3 +108,38 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: (error as Error).message });
   }
 };
+
+//Sign In Function
+export const signIn = async (req: Request, res: Response): Promise<void> => {
+  const { username, password, type } = req.body;
+
+  try {
+    if (type === "buyer") {
+      // Query to check if the buyer exists with matching credentials
+      const result = await pool.query(
+        `SELECT * FROM Customer WHERE c_username = $1 AND c_password = $2`,
+        [username, password]
+      );
+      if (result.rows.length > 0) {
+        res.status(200).json({ success: true, message: "Buyer signed in successfully." });
+      } else {
+        res.status(401).json({ success: false, message: "Invalid buyer credentials." });
+      }
+    } else if (type === "seller") {
+      // Query to check if the seller exists with matching credentials
+      const result = await pool.query(
+        `SELECT * FROM Seller WHERE s_username = $1 AND s_password = $2`,
+        [username, password]
+      );
+      if (result.rows.length > 0) {
+        res.status(200).json({ success: true, message: "Seller signed in successfully." });
+      } else {
+        res.status(401).json({ success: false, message: "Invalid seller credentials." });
+      }
+    } else {
+      res.status(400).json({ success: false, message: "Invalid type. Must be 'buyer' or 'seller'." });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
+  }
+};
