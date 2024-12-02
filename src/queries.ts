@@ -75,3 +75,32 @@ export const deleteUser = async (
     res.status(500).json({ error: (error as Error).message });
   }
 };
+
+//Sign Up Function
+export const signUp = async (req: Request, res: Response): Promise<void> => {
+  const { name, username, password, birthday, phoneNumber, address, type } = req.body;
+  try {
+    if (type === "buyer") {
+      // Insert into Customer table
+      const result = await pool.query(
+        `INSERT INTO Customer (c_name, c_username, c_password, c_birthday, c_number, c_address)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING c_id`,
+        [name, username, password, birthday, phoneNumber, address]
+      );
+      res.status(201).json({ id: result.rows[0].c_id });
+    } else if (type === "seller") {
+      // Insert into Seller table
+      const result = await pool.query(
+        `INSERT INTO Seller (s_name, s_username, s_password, s_birthday, s_number, s_address)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING s_id`,
+        [name, username, password, birthday, phoneNumber, address]
+      );
+      res.status(201).json({ id: result.rows[0].s_id });
+    } else {
+      // Invalid type provided
+      res.status(400).json({ error: "Invalid type. Must be 'buyer' or 'seller'." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};

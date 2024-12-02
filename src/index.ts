@@ -7,6 +7,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  signUp,
 } from "./queries";
 
 dotenv.config();
@@ -24,6 +25,7 @@ app.get("/users/:id", getUserById);
 app.post("/users", createUser);
 app.put("/users/:id", updateUser);
 app.delete("/users/:id", deleteUser);
+app.post("/signup", signUp);
 
 // Start the server
 app.listen(port, () => {

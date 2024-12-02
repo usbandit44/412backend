@@ -9,6 +9,7 @@ dotenv_1.default.config();
 const pool = new pg_1.Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
+    password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     port: parseInt(process.env.DB_PORT || "9999"),
 });
