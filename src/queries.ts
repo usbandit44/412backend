@@ -143,3 +143,19 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ success: false, error: (error as Error).message });
   }
 };
+
+//Query Clothing For Sale
+export const getClothingForSale = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Query to retrieve clothing items with status "for sale"
+    const result = await pool.query(
+      `SELECT cl_id FROM Clothing WHERE cl_status = 'for sale'`
+    );
+    
+    // Extract and return the array of clothing item IDs
+    const clothingIds = result.rows.map((row) => row.cl_id);
+    res.status(200).json(clothingIds);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};

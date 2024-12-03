@@ -9,6 +9,7 @@ import {
   deleteUser,
   signUp,
   signIn,
+  getClothingForSale,
 } from "./queries";
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.put("/users/:id", updateUser);
 app.delete("/users/:id", deleteUser);
 app.post("/signup", signUp);
 app.post("/signIn", signIn);
+app.get("/clothing-for-sale", getClothingForSale);
 
 // Start the server
 app.listen(port, () => {
