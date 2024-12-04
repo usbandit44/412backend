@@ -17,6 +17,9 @@ import {
   getCartItems,
   removeItemFromCart,
   getUserByIdAndType,
+  editUser,
+  getSellerItems,
+  addItem,
 } from "./queries";
 
 dotenv.config();
@@ -44,6 +47,9 @@ app.post("/cart", addItemToCart);
 app.get("/cart/:customerId", getCartItems);
 app.delete("/cart", removeItemFromCart);
 app.get("/user/:id/:type", getUserByIdAndType);
+app.put("/user", editUser);
+app.get("/seller-items/:sellerId", getSellerItems);
+app.post("/add-item", addItem);
 
 // Start the server
 app.listen(port, () => {

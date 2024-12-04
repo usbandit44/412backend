@@ -307,3 +307,84 @@ export const getUserByIdAndType = async (req: Request, res: Response): Promise<v
   }
 };
 
+//Edit User
+export const editUser = async (req: Request, res: Response): Promise<void> => {
+  const { id, username, password, birthday, number, address, type } = req.body;
+
+  try {
+    let query = "";
+    const values = [username, password, birthday, number, address, id];
+
+    // Determine the table to update based on the type
+    if (type === "customer") {
+      query = `
+        UPDATE Customer 
+        SET c_username = $1, c_password = $2, c_birthday = $3, c_number = $4, c_address = $5 
+        WHERE c_id = $6
+        RETURNING *`;
+    } else if (type === "seller") {
+      query = `
+        UPDATE Seller 
+        SET s_username = $1, s_password = $2, s_birthday = $3, s_number = $4, s_address = $5 
+        WHERE s_id = $6
+        RETURNING *`;
+    } else {
+      res.status(400).json({ message: "Invalid type. Must be 'customer' or 'seller'." });
+      return; // Exit the function for invalid type
+    }
+
+    // Execute the query
+    const result = await pool.query(query, values);
+
+    // Check if a user was updated
+    if (result.rows.length > 0) {
+      res.status(200).json({ message: "User updated successfully.", user: result.rows[0] });
+    } else {
+      res.status(404).json({ message: "User not found or no changes made." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+//Sellers Items
+export const getSellerItems = async (req: Request, res: Response): Promise<void> => {
+  const { sellerId } = req.params;
+
+  try {
+    // Query to get all clothing item IDs for the specified seller
+    const result = await pool.query(
+      `SELECT cl_id FROM Clothing WHERE cl_sellerId = $1`,
+      [sellerId]
+    );
+
+    // Extract the array of item IDs
+    const itemIds = result.rows.map((row) => row.cl_id);
+
+    res.status(200).json(itemIds);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+//Add Item
+export const addItem = async (req: Request, res: Response): Promise<void> => {
+  const { name, description, size, price, image, status, sellerId } = req.body;
+
+  try {
+    // Query to insert a new clothing item into the Clothing table
+    const result = await pool.query(
+      `INSERT INTO Clothing (cl_name, cl_desc, cl_size, cl_price, cl_image, cl_status, cl_sellerId) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING cl_id`,
+      [name, description, size, price, image, status, sellerId]
+    );
+
+    // Return the ID of the newly created item
+    res.status(201).json({
+      message: "Item successfully added.",
+      itemId: result.rows[0].cl_id,
+    });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
