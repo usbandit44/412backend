@@ -216,3 +216,94 @@ export const getSpecificItem = async (req: Request, res: Response): Promise<void
     res.status(500).json({ error: (error as Error).message });
   }
 };
+
+//Add Item to Shopping Cart
+export const addItemToCart = async (req: Request, res: Response): Promise<void> => {
+  const { customerId, itemId } = req.body;
+
+  try {
+    // Insert the customer ID and item ID into the Cart table
+    await pool.query(
+      `INSERT INTO Cart (ca_customerId, ca_item) VALUES ($1, $2)`,
+      [customerId, itemId]
+    );
+    
+    res.status(201).json({ message: "Item successfully added to shopping cart." });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+//Query All Shopping Cart Items
+export const getCartItems = async (req: Request, res: Response): Promise<void> => {
+  const { customerId } = req.params;
+
+  try {
+    // Query to retrieve all item IDs from the Cart table for the given customer ID
+    const result = await pool.query(
+      `SELECT ca_item FROM Cart WHERE ca_customerId = $1`,
+      [customerId]
+    );
+
+    // Extract and return the array of item IDs
+    const itemIds = result.rows.map((row) => row.ca_item);
+    res.status(200).json(itemIds);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+//Remove Item From Shopping Cart
+export const removeItemFromCart = async (req: Request, res: Response): Promise<void> => {
+  const { customerId, itemId } = req.body;
+
+  try {
+    // Query to delete the specific item from the Cart table for the given customer ID
+    const result = await pool.query(
+      `DELETE FROM Cart WHERE ca_customerId = $1 AND ca_item = $2`,
+      [customerId, itemId]
+    );
+
+    // Check if rowCount exists and is greater than 0
+    if (result.rowCount && result.rowCount > 0) {
+      res.status(200).json({ message: "Item successfully removed from the cart." });
+    } else {
+      res.status(404).json({ message: "Item not found in the cart." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+//Query User
+export const getUserByIdAndType = async (req: Request, res: Response): Promise<void> => {
+  const { id, type } = req.params;
+
+  try {
+    let query = "";
+
+    // Determine the table to query based on the type
+    if (type === "customer") {
+      query = `SELECT * FROM Customer WHERE c_id = $1`;
+    } else if (type === "seller") {
+      query = `SELECT * FROM Seller WHERE s_id = $1`;
+    } else {
+      // Explicitly return the response for invalid type
+      res.status(400).json({ message: "Invalid type. Must be 'customer' or 'seller'." });
+      return; // Add return to ensure function ends here
+    }
+
+    // Execute the query
+    const result = await pool.query(query, [id]);
+
+    // Check if a user was found
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: "User not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+

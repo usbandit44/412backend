@@ -13,6 +13,10 @@ import {
   addItemToLiked,
   getLikedItems,
   getSpecificItem,
+  addItemToCart,
+  getCartItems,
+  removeItemFromCart,
+  getUserByIdAndType,
 } from "./queries";
 
 dotenv.config();
@@ -36,6 +40,10 @@ app.get("/clothing-for-sale", getClothingForSale);
 app.post("/liked-items", addItemToLiked);
 app.get("/liked-items/:customerId", getLikedItems);
 app.get("/item/:itemId", getSpecificItem);
+app.post("/cart", addItemToCart);
+app.get("/cart/:customerId", getCartItems);
+app.delete("/cart", removeItemFromCart);
+app.get("/user/:id/:type", getUserByIdAndType);
 
 // Start the server
 app.listen(port, () => {
