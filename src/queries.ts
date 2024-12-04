@@ -159,3 +159,60 @@ export const getClothingForSale = async (req: Request, res: Response): Promise<v
     res.status(500).json({ error: (error as Error).message });
   }
 };
+
+//Add Item to Liked Items
+export const addItemToLiked = async (req: Request, res: Response): Promise<void> => {
+  const { customerId, itemId } = req.body;
+
+  try {
+    // Insert the customer ID and item ID into the Liked table
+    await pool.query(
+      `INSERT INTO Liked (l_customerId, l_item) VALUES ($1, $2)`,
+      [customerId, itemId]
+    );
+    
+    res.status(201).json({ message: "Item successfully added to liked items." });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+//Display Liked Items
+export const getLikedItems = async (req: Request, res: Response): Promise<void> => {
+  const { customerId } = req.params;
+
+  try {
+    // Query to retrieve all item IDs from the Liked table for the given customer ID
+    const result = await pool.query(
+      `SELECT l_item FROM Liked WHERE l_customerId = $1`,
+      [customerId]
+    );
+
+    // Extract and return the array of item IDs
+    const itemIds = result.rows.map((row) => row.l_item);
+    res.status(200).json(itemIds);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+//Query Specific Items
+export const getSpecificItem = async (req: Request, res: Response): Promise<void> => {
+  const { itemId } = req.params;
+
+  try {
+    // Query to fetch the clothing item's name, price, and size based on the item ID
+    const result = await pool.query(
+      `SELECT cl_name, cl_price, cl_size FROM Clothing WHERE cl_id = $1`,
+      [itemId]
+    );
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: "Item not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};

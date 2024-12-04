@@ -10,6 +10,9 @@ import {
   signUp,
   signIn,
   getClothingForSale,
+  addItemToLiked,
+  getLikedItems,
+  getSpecificItem,
 } from "./queries";
 
 dotenv.config();
@@ -30,6 +33,9 @@ app.delete("/users/:id", deleteUser);
 app.post("/signup", signUp);
 app.post("/signIn", signIn);
 app.get("/clothing-for-sale", getClothingForSale);
+app.post("/liked-items", addItemToLiked);
+app.get("/liked-items/:customerId", getLikedItems);
+app.get("/item/:itemId", getSpecificItem);
 
 // Start the server
 app.listen(port, () => {
